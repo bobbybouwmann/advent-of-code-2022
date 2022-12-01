@@ -15,7 +15,14 @@ use Illuminate\Support\Facades\Storage;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    $groupedRoutes = collect(Route::getRoutes()->getRoutes())
+        ->filter(function (\Illuminate\Routing\Route $route) {
+            return preg_match('~[0-9]+~', $route->uri());
+        })->groupBy(function (\Illuminate\Routing\Route $route) {
+            return explode('-', $route->uri())[0];
+        });
+
+    return view('welcome', ['groupedRoutes' => $groupedRoutes]);
 });
 
 Route::get('/1-1', function () {
