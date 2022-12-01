@@ -32,25 +32,20 @@
             </svg>
         </div>
 
-        <h2 class="text-white text-lg text-center mt-6">
-            <a href="https://github.com/bobbybouwmann/advent-of-code-2022">Advent of Code 2022</a>
+        <h2 class="text-white text-lg text-left mt-6">
+            <a href="https://github.com/bobbybouwmann/advent-of-code-2022">Advent of Code 2022 - Day {{ explode('-', \Illuminate\Support\Facades\Route::getCurrentRoute()->uri())[0] }}</a>
         </h2>
 
-        <div class="mt-6 bg-white dark:bg-gray-800 overflow-hidden shadow sm:rounded-lg">
-            @foreach ($groupedRoutes as $day => $routes)
-                <div class="px-6 py-4">
-                    <div class="flex items-center">
-                        <span class="text-gray-500">Day {{ $day }}</span>
-                        @foreach ($routes as $route)
+        <div class="mt-6 bg-white dark:bg-white overflow-hidden shadow sm:rounded-lg p-6">
+            Result: {{ $result }}
+        </div>
 
-                            <div class="ml-4 text-sm leading-7 font-semibold">
-                                <a href="{{ url($route->uri()) }}"
-                                   class="underline text-gray-900 dark:text-white">{{ $route->uri() }}</a>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-            @endforeach
+        <div class="mt-6 bg-white dark:bg-white overflow-hidden shadow sm:rounded-lg p-6">
+            <pre>{{ \App\Services\ClosureDump::dump(\Illuminate\Support\Facades\Route::getCurrentRoute()->action['uses']) }}</pre>
+        </div>
+
+        <div class="text-black dark:text-white text-md mt-6">
+            <a href="{{ url('/') }}"><span class="mr-2">👈</span>Back to overview</a>
         </div>
     </div>
 </div>
