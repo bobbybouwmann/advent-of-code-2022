@@ -59,9 +59,9 @@ Route::get('/2-1', function () {
     function score(string $letter): int
     {
         return match($letter) {
-            'A', 'X' => 1,
-            'B', 'Y' => 2,
-            'C', 'Z' => 3,
+            'A', 'X' => 1, // Rock
+            'B', 'Y' => 2, // Paper
+            'C', 'Z' => 3, // Scissors
         };
     }
 
@@ -80,6 +80,74 @@ Route::get('/2-1', function () {
         if (($mine === 'X' && $theirs === 'C')
             || ($mine === 'Y' && $theirs === 'A')
             || ($mine === 'Z' && $theirs === 'B')
+        ) {
+            return $score + 6;
+        }
+
+        // Loss = score + 0
+        return $score;
+    })->sum();
+
+    return view('result', ['result' => $result]);
+});
+
+Route::get('/2-2', function () {
+    $input = collect(explode(PHP_EOL, trim(Storage::get('input/day2.txt'))));
+
+    function score(string $letter): int
+    {
+        return match($letter) {
+            'A', 'D' => 1, // Rock
+            'B', 'E' => 2, // Paper
+            'C', 'F' => 3, // Scissors
+        };
+    }
+
+    function mine(string $letter, string $theirs): string
+    {
+        // Win
+        if ($letter === 'Z') {
+            return match($theirs) {
+                'A' => 'E',
+                'B' => 'F',
+                'C' => 'D',
+            };
+        }
+
+        // Draw
+        if ($letter === 'Y') {
+            return match($theirs) {
+                'A' => 'D',
+                'B' => 'E',
+                'C' => 'F',
+            };
+        }
+
+        // Lose
+        return match($theirs) {
+            'A' => 'F',
+            'B' => 'D',
+            'C' => 'E',
+        };
+    }
+
+    $result = $input->map(function ($game) {
+        [$theirs, $decision] = explode(' ', $game);
+
+        $mine = mine($decision, $theirs);
+
+        // Add default score for hand
+        $score = score($mine);
+
+        // Draw = score + 3
+        if (score($theirs) === score($mine)) {
+            return $score + 3;
+        }
+
+        // Win = score + 6
+        if (($mine === 'D' && $theirs === 'C')
+            || ($mine === 'E' && $theirs === 'A')
+            || ($mine === 'F' && $theirs === 'B')
         ) {
             return $score + 6;
         }
