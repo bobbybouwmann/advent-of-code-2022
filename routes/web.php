@@ -56,41 +56,35 @@ Route::get('/1-2', function () {
 Route::get('/2-1', function () {
     $input = collect(explode(PHP_EOL, trim(Storage::get('input/day2.txt'))));
 
-    $win = 6;
-    $draw = 3;
-    $scores = [
-        'A' => 1,
-        'B' => 2,
-        'C' => 3,
-        'X' => 1,
-        'Y' => 2,
-        'Z' => 3,
-    ];
+    function score(string $letter): int
+    {
+        return match($letter) {
+            'A', 'X' => 1,
+            'B', 'Y' => 2,
+            'C', 'Z' => 3,
+        };
+    }
 
-    $result = $input->map(function ($game) use ($win, $draw, $scores) {
-        $score = 0;
-
-        $hands = explode(' ', $game);
-        $theirs = strtoupper($hands[0]);
-        $mine = strtoupper($hands[1]);
+    $result = $input->map(function ($game) {
+        [$theirs, $mine] = explode(' ', $game);
 
         // Add default score for hand
-        $score += $scores[$mine];
+        $score = score($mine);
 
-        // Draw
-        if ($scores[$theirs] === $scores[$mine]) {
-            return $score += $draw;
+        // Draw = score + 3
+        if (score($theirs) === score($mine)) {
+            return $score + 3;
         }
 
-        // Win
+        // Win = score + 6
         if (($mine === 'X' && $theirs === 'C')
             || ($mine === 'Y' && $theirs === 'A')
             || ($mine === 'Z' && $theirs === 'B')
         ) {
-            return $score += $win;
+            return $score + 6;
         }
 
-        // Everything else is defeat
+        // Loss = score + 0
         return $score;
     })->sum();
 
