@@ -28,7 +28,7 @@ Route::get('/', function () {
 Route::get('/1-1', function () {
     $input = collect(explode(PHP_EOL . PHP_EOL, Storage::get('input/day1.txt')));
 
-    $result =  $input->map(function ($result) {
+    $result = $input->map(function ($result) {
         return array_sum(
             explode(PHP_EOL, trim($result))
         );
@@ -42,13 +42,57 @@ Route::get('/1-1', function () {
 Route::get('/1-2', function () {
     $input = collect(explode(PHP_EOL . PHP_EOL, Storage::get('input/day1.txt')));
 
-    $result =  $input->map(function ($result) {
+    $result = $input->map(function ($result) {
         return array_sum(
             explode(PHP_EOL, trim($result))
         );
     })->sortByDesc(function ($result) {
         return $result;
     })->take(3)->sum();
+
+    return view('result', ['result' => $result]);
+});
+
+Route::get('/2-1', function () {
+    $input = collect(explode(PHP_EOL, trim(Storage::get('input/day2.txt'))));
+
+    $win = 6;
+    $draw = 3;
+    $scores = [
+        'A' => 1,
+        'B' => 2,
+        'C' => 3,
+        'X' => 1,
+        'Y' => 2,
+        'Z' => 3,
+    ];
+
+    $result = $input->map(function ($game) use ($win, $draw, $scores) {
+        $score = 0;
+
+        $hands = explode(' ', $game);
+        $theirs = strtoupper($hands[0]);
+        $mine = strtoupper($hands[1]);
+
+        // Add default score for hand
+        $score += $scores[$mine];
+
+        // Draw
+        if ($scores[$theirs] === $scores[$mine]) {
+            return $score += $draw;
+        }
+
+        // Win
+        if (($mine === 'X' && $theirs === 'C')
+            || ($mine === 'Y' && $theirs === 'A')
+            || ($mine === 'Z' && $theirs === 'B')
+        ) {
+            return $score += $win;
+        }
+
+        // Everything else is defeat
+        return $score;
+    })->sum();
 
     return view('result', ['result' => $result]);
 });
