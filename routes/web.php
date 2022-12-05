@@ -195,3 +195,41 @@ Route::get('/3-2', function () {
 
     return view('result', ['result' => $result]);
 });
+
+Route::get('/4-1', function () {
+    $input = collect(explode(PHP_EOL, trim(Storage::get('input/day4.txt'))));
+
+    $result = $input->filter(function ($item) {
+        [$one, $two] = explode(',', $item);
+
+        [$startOne, $endOne] = explode('-', $one);
+        [$startTwo, $endTwo] = explode('-', $two);
+
+        $rangeOne = range($startOne, $endOne);
+        $rangeTwo = range($startTwo, $endTwo);
+
+        return count(array_intersect($rangeOne, $rangeTwo)) === count($rangeOne)
+            || count(array_intersect($rangeTwo, $rangeOne)) === count($rangeTwo);
+    })->count();
+
+    return view('result', ['result' => $result]);
+});
+
+Route::get('/4-2', function () {
+    $input = collect(explode(PHP_EOL, trim(Storage::get('input/day4.txt'))));
+
+    $result = $input->filter(function ($item) {
+        [$one, $two] = explode(',', $item);
+
+        [$startOne, $endOne] = explode('-', $one);
+        [$startTwo, $endTwo] = explode('-', $two);
+
+        $rangeOne = range($startOne, $endOne);
+        $rangeTwo = range($startTwo, $endTwo);
+
+        return count(array_intersect($rangeOne, $rangeTwo))
+            || count(array_intersect($rangeTwo, $rangeOne));
+    })->count();
+
+    return view('result', ['result' => $result]);
+});
