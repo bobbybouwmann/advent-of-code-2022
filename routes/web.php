@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 
@@ -58,7 +59,7 @@ Route::get('/2-1', function () {
 
     function score(string $letter): int
     {
-        return match($letter) {
+        return match ($letter) {
             'A', 'X' => 1, // Rock
             'B', 'Y' => 2, // Paper
             'C', 'Z' => 3, // Scissors
@@ -96,7 +97,7 @@ Route::get('/2-2', function () {
 
     function score(string $letter): int
     {
-        return match($letter) {
+        return match ($letter) {
             'A', 'D' => 1, // Rock
             'B', 'E' => 2, // Paper
             'C', 'F' => 3, // Scissors
@@ -107,7 +108,7 @@ Route::get('/2-2', function () {
     {
         // Win
         if ($letter === 'Z') {
-            return match($theirs) {
+            return match ($theirs) {
                 'A' => 'E',
                 'B' => 'F',
                 'C' => 'D',
@@ -116,7 +117,7 @@ Route::get('/2-2', function () {
 
         // Draw
         if ($letter === 'Y') {
-            return match($theirs) {
+            return match ($theirs) {
                 'A' => 'D',
                 'B' => 'E',
                 'C' => 'F',
@@ -124,7 +125,7 @@ Route::get('/2-2', function () {
         }
 
         // Lose
-        return match($theirs) {
+        return match ($theirs) {
             'A' => 'F',
             'B' => 'D',
             'C' => 'E',
@@ -155,6 +156,42 @@ Route::get('/2-2', function () {
         // Loss = score + 0
         return $score;
     })->sum();
+
+    return view('result', ['result' => $result]);
+});
+
+Route::get('/3-1', function () {
+    $input = collect(explode(PHP_EOL, trim(Storage::get('input/day3.txt'))));
+
+    $result = $input->map(function (string $string) {
+        [$part1, $part2] = str_split($string, strlen($string) / 2);
+
+        return collect(str_split($part1))
+            ->intersect(collect(str_split($part2)))
+            ->first();
+    })->map(function (string $letter) {
+        $letters = array_merge(range('a', 'z'), range('A', 'Z'));
+
+        return array_search($letter, $letters) + 1;
+    })->sum();
+
+    return view('result', ['result' => $result]);
+});
+
+Route::get('/3-2', function () {
+    $input = collect(explode(PHP_EOL, trim(Storage::get('input/day3.txt'))));
+
+    $result = $input->chunk(3)
+        ->map(function (Collection $collection) {
+            return $collection->reduce(function ($intersection, $items) {
+                $intersection = $intersection ?? collect(str_split($items));
+                return $intersection->intersect(collect(str_split($items)));
+            })->unique()->first();
+        })
+        ->map(function (string $letter) {
+            $letters = array_merge(range('a', 'z'), range('A', 'Z'));
+            return array_search($letter, $letters) + 1;
+        })->sum();
 
     return view('result', ['result' => $result]);
 });
